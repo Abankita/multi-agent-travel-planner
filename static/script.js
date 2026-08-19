@@ -1,5 +1,134 @@
-const form=document.querySelector('#trip-form'),result=document.querySelector('#result'),loading=document.querySelector('#loading'),errorBox=document.querySelector('#error');
-const escapeHtml=(v='')=>String(v).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
-function markdown(t){return escapeHtml(t).replace(/^### (.*)$/gm,'<h3>$1</h3>').replace(/^## (.*)$/gm,'<h2>$1</h2>').replace(/^# (.*)$/gm,'<h1>$1</h1>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/^- (.*)$/gm,'<li>$1</li>').replace(/\n/g,'<br>')}
-function render(d){document.querySelector('#itinerary').innerHTML=markdown(d.itinerary);let f=d.flights.flights||[],note=d.flights.notice?`<p class="notice">${escapeHtml(d.flights.notice)}</p>`:'';document.querySelector('#flights').innerHTML=note+(f.length?f.map(x=>`<div class="flight"><b>${escapeHtml(x.airline)} ${escapeHtml(x.number)}</b><span>${escapeHtml(x.departure)} → ${escapeHtml(x.arrival)}</span><small>${escapeHtml(x.status)}</small></div>`).join(''):'');document.querySelector('#weather').innerHTML=`<p>${escapeHtml(d.weather.summary)}</p>`;let s=[...(d.weather.sources||[]),...(d.research.sources||[])];document.querySelector('#sources').innerHTML=s.length?s.map(x=>x.url?`<a href="${escapeHtml(x.url)}" target="_blank" rel="noreferrer">${escapeHtml(x.title)} ↗</a>`:`<p>${escapeHtml(x.content)}</p>`).join(''):'<p>Research sources were unavailable for this search.</p>'}
-form.addEventListener('submit',async e=>{e.preventDefault();errorBox.classList.add('hidden');result.classList.add('hidden');loading.classList.remove('hidden');let p=Object.fromEntries(new FormData(form));p.travellers=Number(p.travellers);try{let r=await fetch('/api/plan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(p)}),d=await r.json();if(!r.ok)throw Error(d.detail||'Unable to plan this trip.');render(d);result.classList.remove('hidden');result.scrollIntoView({behavior:'smooth'})}catch(err){errorBox.textContent=err.message;errorBox.classList.remove('hidden')}finally{loading.classList.add('hidden')}});document.querySelector('#new-plan').addEventListener('click',()=>form.scrollIntoView({behavior:'smooth'}));
+const form = document.querySelector('#trip-form'), result = document.querySelector('#result'), loading = document.querySelector('#loading'), errorBox = document.querySelector('#error');
+const escapeHtml = (v = '') => String(v).replace(/[&<>'"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[c]));
+function markdown(t) { return escapeHtml(t).replace(/^### (.*)$/gm, '<h3>$1</h3>').replace(/^## (.*)$/gm, '<h2>$1</h2>').replace(/^# (.*)$/gm, '<h1>$1</h1>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/^- (.*)$/gm, '<li>$1</li>').replace(/\n/g, '<br>') }
+function render(d) { document.querySelector('#itinerary').innerHTML = markdown(d.itinerary); let f = d.flights.flights || [], note = d.flights.notice ? `<p class="notice">${escapeHtml(d.flights.notice)}</p>` : ''; document.querySelector('#flights').innerHTML = note + (f.length ? f.map(x => `<div class="flight"><b>${escapeHtml(x.airline)} ${escapeHtml(x.number)}</b><span>${escapeHtml(x.departure)} → ${escapeHtml(x.arrival)}</span><small>${escapeHtml(x.status)}</small></div>`).join('') : ''); document.querySelector('#weather').innerHTML = `<p>${escapeHtml(d.weather.summary)}</p>`; let s = [...(d.weather.sources || []), ...(d.research.sources || [])]; document.querySelector('#sources').innerHTML = s.length ? s.map(x => x.url ? `<a href="${escapeHtml(x.url)}" target="_blank" rel="noreferrer">${escapeHtml(x.title)} ↗</a>` : `<p>${escapeHtml(x.content)}</p>`).join('') : '<p>Research sources were unavailable for this search.</p>' }
+form.addEventListener('submit', async e => { e.preventDefault(); errorBox.classList.add('hidden'); result.classList.add('hidden'); loading.classList.remove('hidden'); let p = Object.fromEntries(new FormData(form)); p.travellers = Number(p.travellers); try { let r = await fetch('/api/plan', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(p) }), d = await r.json(); if (!r.ok) throw Error(d.detail || 'Unable to plan this trip.'); render(d); result.classList.remove('hidden'); result.scrollIntoView({ behavior: 'smooth' }) } catch (err) { errorBox.textContent = err.message; errorBox.classList.remove('hidden') } finally { loading.classList.add('hidden') } }); document.querySelector('#new-plan').addEventListener('click', () => form.scrollIntoView({ behavior: 'smooth' }));
+const form = document.querySelector('#trip-form');
+const result = document.querySelector('#result');
+const loading = document.querySelector('#loading');
+const errorBox = document.querySelector('#error');
+
+const escapeHtml = (v = '') =>
+    String(v).replace(
+        /[&<>'"]/g,
+        (c) =>
+            ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                "'": '&#39;',
+                '"': '&quot;',
+            })[c]
+    );
+
+function markdown(t) {
+    return escapeHtml(t)
+        .replace(/^### (.*)$/gm, '<h3>$1</h3>')
+        .replace(/^## (.*)$/gm, '<h2>$1</h2>')
+        .replace(/^# (.*)$/gm, '<h1>$1</h1>')
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/^- (.*)$/gm, '<li>$1</li>')
+        .replace(/\n/g, '<br>');
+}
+
+function render(d) {
+    document.querySelector('#itinerary').innerHTML = markdown(d.itinerary);
+
+    const flights = d.flights.flights || [];
+    const note = d.flights.notice
+        ? `<p class="notice">${escapeHtml(d.flights.notice)}</p>`
+        : '';
+
+    document.querySelector('#flights').innerHTML =
+        note +
+        (flights.length
+            ? flights
+                  .map(
+                      (x) => `
+                        <div class="flight">
+                            <b>${escapeHtml(x.airline)} ${escapeHtml(x.number)}</b>
+                            <span>
+                                ${escapeHtml(x.departure)} → 
+                                ${escapeHtml(x.arrival)}
+                            </span>
+                            <small>${escapeHtml(x.status)}</small>
+                        </div>
+                    `
+                  )
+                  .join('')
+            : '');
+
+    document.querySelector('#weather').innerHTML = `
+        <p>${escapeHtml(d.weather.summary)}</p>
+    `;
+
+    const sources = [
+        ...(d.weather.sources || []),
+        ...(d.research.sources || []),
+    ];
+
+    document.querySelector('#sources').innerHTML = sources.length
+        ? sources
+              .map((x) =>
+                  x.url
+                      ? `
+                        <a 
+                            href="${escapeHtml(x.url)}" 
+                            target="_blank" 
+                            rel="noreferrer"
+                        >
+                            ${escapeHtml(x.title)} ↗
+                        </a>
+                    `
+                      : `<p>${escapeHtml(x.content)}</p>`
+              )
+              .join('')
+        : '<p>Research sources were unavailable for this search.</p>';
+}
+
+form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    errorBox.classList.add('hidden');
+    result.classList.add('hidden');
+    loading.classList.remove('hidden');
+
+    const p = Object.fromEntries(new FormData(form));
+    p.travellers = Number(p.travellers);
+
+    try {
+        const response = await fetch('/api/plan', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(p),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                data.detail || 'Unable to plan this trip.'
+            );
+        }
+
+        render(data);
+
+        result.classList.remove('hidden');
+        result.scrollIntoView({
+            behavior: 'smooth',
+        });
+    } catch (err) {
+        errorBox.textContent = err.message;
+        errorBox.classList.remove('hidden');
+    } finally {
+        loading.classList.add('hidden');
+    }
+});
+
+document.querySelector('#new-plan').addEventListener('click', () => {
+    form.scrollIntoView({
+        behavior: 'smooth',
+    });
+});
