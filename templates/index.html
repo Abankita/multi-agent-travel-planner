@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Waypoint AI — Travel planner</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+    <main class="shell">
+        <header><span class="eyebrow">MULTI-AGENT TRAVEL PLANNER</span>
+            <h1>Plan a trip with a small team of travel specialists.</h1>
+            <p>Flight data and live status, web research, weather guidance, and a coherent day-by-day itinerary.</p>
+        </header>
+        <section class="planner">
+            <form id="trip-form">
+                <div class="grid"><label>Leaving from<input name="origin" placeholder="Delhi or DEL"
+                            required></label><label>Going to<input name="destination" placeholder="Tokyo or NRT"
+                            required></label></div>
+                <div class="grid"><label>Departure<input name="start_date" type="date"
+                            required></label><label>Return<input name="end_date" type="date" required></label></div>
+                <div class="grid"><label>Travellers<input name="travellers" type="number" min="1" max="12" value="1"
+                            required></label><label>Budget<select name="budget">
+                            <option value="budget">Budget</option>
+                            <option value="moderate" selected>Moderate</option>
+                            <option value="premium">Premium</option>
+                        </select></label></div><label>Interests <span>(optional)</span><input name="interests"
+                        placeholder="food, museums, hikes, local culture"></label><button type="submit">Build my travel
+                    plan <span>→</span></button>
+            </form>
+            <aside>
+                <h2>Your agent team</h2>
+                <p><b>Flight data agent</b><br>Looks up AviationStack flight data and live status.</p>
+                <p><b>Weather agent</b><br>Researches destination forecast and packing guidance.</p>
+                <p><b>Local expert</b><br>Finds relevant sights and practical sources.</p>
+                <p><b>Itinerary agent</b><br>Combines their briefings into a feasible plan.</p>
+            </aside>
+        </section>
+        <section id="loading" class="loading hidden"><i></i>
+            <div><b>Agents are planning your trip</b><span>Researching flights, weather, and local experiences…</span>
+            </div>
+        </section>
+        <section id="error" class="error hidden"></section>
+        <section id="result" class="results hidden">
+            <div class="result-head"><span class="eyebrow">YOUR TRIP BRIEF</span><button id="new-plan" type="button">New
+                    search</button></div>
+            <article class="itinerary">
+                <div id="itinerary"></div>
+            </article>
+            <div class="cards">
+                <article>
+                    <h2>✈ Flight data & status</h2>
+                    <div id="flights"></div>
+                </article>
+                <article>
+                    <h2>☁ Weather guidance</h2>
+                    <div id="weather"></div>
+                </article>
+                <article>
+                    <h2>⌁ Research sources</h2>
+                    <div id="sources"></div>
+                </article>
+            </div>
+        </section>
+    </main>
+    <script src="/static/script.js"></script>
+</body>
+
+</html>
